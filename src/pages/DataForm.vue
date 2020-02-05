@@ -32,14 +32,13 @@
       <q-input
         filled
         type="number"
-        v-model="age"
+        v-model="phone"
         label="Número"
         hint="Número sem o +55, porém com o DDD e o 9º Dígito"
         lazy-rules
         :rules="[
-          val => val !== null && val !== '' || 'Ops, digite corretamente',
-          val => val.length <= 12 || 'Ops, digite um número com 11 dígitos',
-          val => val.length >= 10 || 'Ops, digite um número com 11 dígitos'
+          val => val !== null && val !== '' || 'Ops, digite algo',
+          val => val.length === 11 || 'Ops, digite um número com 11 dígitos'
         ]"
       />
 
@@ -60,7 +59,7 @@ export default {
   data () {
     return {
       name: null,
-      age: null,
+      phone: null,
       persons: [],
       accept: false
     }
@@ -79,14 +78,14 @@ export default {
     onSubmit () {
       this.persons.push({
         name: this.name,
-        phone: this.age,
-        url: 'http://wa.me/55' + this.age
+        phone: this.phone,
+        url: 'http://wa.me/55' + this.phone
       })
     },
 
     onReset () {
       this.name = null
-      this.age = null
+      this.phone = null
       this.accept = false
     }
   }
