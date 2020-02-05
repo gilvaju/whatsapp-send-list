@@ -1,6 +1,20 @@
 <template>
   <div class="q-pa-md">
 
+    <div class="row">
+      <q-btn @click="sendForall" outline style="width: 100%; color: goldenrod;" label="Enviar mensagem para todos" />
+    </div>
+
+    <div class="q-pa-md" style="max-width: 350px">
+      <q-list bordered separator>
+        <template v-for="person in persons">
+          <q-item @click="onClick(person.url)" clickable v-ripple>
+            <q-item-section>{{ person.name }}</q-item-section>
+          </q-item>
+        </template>
+      </q-list>
+    </div>
+
     <q-form
       @submit="onSubmit"
       @reset="onReset"
@@ -20,20 +34,20 @@
         type="number"
         v-model="age"
         label="Número"
-        hint="Número sem o +55, 84 e o 9º Dígito"
+        hint="Número sem o +55, porém com o DDD e o 9º Dígito"
         lazy-rules
         :rules="[
           val => val !== null && val !== '' || 'Ops, digite corretamente',
-          val => val.length <= 9 || 'Ops, digite um número com 8 dígitos',
-          val => val.length >= 7 || 'Ops, digite um número com 8 dígitos'
+          val => val.length <= 12 || 'Ops, digite um número com 11 dígitos',
+          val => val.length >= 10 || 'Ops, digite um número com 11 dígitos'
         ]"
       />
 
 <!--      <q-toggle v-model="accept" label="I accept the license and terms" />-->
 
       <div>
-        <q-btn label="Submit" type="Salvar" color="primary"/>
-        <q-btn label="Reset" type="Limpar" color="primary" flat class="q-ml-sm" />
+        <q-btn label="Salvar" type="submit" color="primary"/>
+        <q-btn label="Limpar" type="reset" color="primary" flat class="q-ml-sm" />
       </div>
     </q-form>
 
@@ -47,28 +61,27 @@ export default {
     return {
       name: null,
       age: null,
-
+      persons: [],
       accept: false
     }
   },
 
   methods: {
-    onSubmit () {
-      if (this.accept !== true) {
-        this.$q.notify({
-          color: 'red-5',
-          textColor: 'white',
-          icon: 'warning',
-          message: 'You need to accept the license and terms first'
-        })
-      } else {
-        this.$q.notify({
-          color: 'green-4',
-          textColor: 'white',
-          icon: 'cloud_done',
-          message: 'Submitted'
-        })
+    onClick (url) {
+      window.open(url)
+    },
+    sendForall () {
+      function urlOpen (element, index, array) {
+        window.open(element.url)
       }
+      this.persons.forEach(urlOpen)
+    },
+    onSubmit () {
+      this.persons.push({
+        name: this.name,
+        phone: this.age,
+        url: 'http://wa.me/55' + this.age
+      })
     },
 
     onReset () {
