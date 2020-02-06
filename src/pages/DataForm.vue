@@ -1,18 +1,17 @@
 <template>
   <div class="q-pa-md">
 
-    <div class="row">
-      <q-btn @click="sendForall" outline style="width: 100%; color: goldenrod;" label="Enviar mensagem para todos" />
-    </div>
+    <div class="row q-mb-xl">
+      <div class="col-12">
+        <q-input
+          v-model="message"
+          filled
+          type="textarea"
+          class="q-mb-sm"
+        />
 
-    <div class="q-pa-md" style="max-width: 350px">
-      <q-list bordered separator>
-        <template v-for="person in persons">
-          <q-item @click="onClick(person.url)" clickable v-ripple>
-            <q-item-section>{{ person.name }}</q-item-section>
-          </q-item>
-        </template>
-      </q-list>
+        <q-btn @click="sendForall" color="primary" style="width: 100%;" label="Enviar mensagem para todos" />
+      </div>
     </div>
 
     <q-form
@@ -20,35 +19,61 @@
       @reset="onReset"
       class="q-gutter-md"
     >
-      <q-input
-        filled
-        v-model="name"
-        label="Nome"
-        hint="Nome e Sobrenome"
-        lazy-rules
-        :rules="[ val => val && val.length > 0 || 'Ops, digite algo!']"
-      />
-
-      <q-input
-        filled
-        type="number"
-        v-model="phone"
-        label="Número"
-        hint="Número sem o +55, porém com o DDD e o 9º Dígito"
-        lazy-rules
-        :rules="[
+      <div class="row justify-between">
+        <div class="col-6">
+          <q-input
+            dense
+            filled
+            v-model="name"
+            label="Nome"
+            hint="Nome e Sobrenome"
+            lazy-rules
+            :rules="[ val => val && val.length > 0 || 'Ops, digite algo!']"
+          />
+        </div>
+        <div class="col-5"><q-input
+          dense
+          filled
+          type="number"
+          v-model="phone"
+          label="Número"
+          hint="DDD e o 9º Dígito"
+          lazy-rules
+          :rules="[
           val => val !== null && val !== '' || 'Ops, digite algo',
           val => val.length === 11 || 'Ops, digite um número com 11 dígitos'
         ]"
-      />
+        />
+        </div>
+      </div>
 
 <!--      <q-toggle v-model="accept" label="I accept the license and terms" />-->
 
-      <div>
-        <q-btn label="Salvar" type="submit" color="primary"/>
-        <q-btn label="Limpar" type="reset" color="primary" flat class="q-ml-sm" />
+      <div class="row justify-between text-right">
+        <q-btn size="md" label="Adicionar número a lista" type="submit" style="width: 100%" outline color="dark"/>
       </div>
     </q-form>
+
+    <div class="q-pa-md">
+<!--      <q-toggle v-model="expanded" label="Expanded" class="q-mb-md" />-->
+
+      <q-expansion-item
+        v-model="expanded"
+        icon="perm_identity"
+        label="Listagem de Contatos"
+        caption="Clique para visualizar"
+      >
+
+        <q-list bordered separator>
+          <template v-for="person in persons">
+            <q-item @click="onClick(person.url)" clickable v-ripple>
+              <q-item-section>{{ person.name }}</q-item-section>
+            </q-item>
+          </template>
+        </q-list>
+
+      </q-expansion-item>
+    </div>
 
   </div>
 </template>
@@ -61,7 +86,8 @@ export default {
       name: null,
       phone: null,
       persons: [],
-      accept: false
+      accept: false,
+      expanded: true
     }
   },
 
