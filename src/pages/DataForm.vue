@@ -17,7 +17,10 @@
           placeholder="Utilize [nome] para ser subistituído pelo nome do contato"
         />
 
-        <q-btn @click="sendForall" color="primary" style="width: 100%;" label="Enviar mensagem para todos" />
+        <q-btn @click="sendForall" class="p-mb-xl" color="primary" style="width: 100%;" label="Enviar mensagem para todos" />
+      </div>
+      <div class="col-12 q-mt-sm">
+        <q-btn @click="importCsv" color="secondary" style="width: 100%;" label="Importar CSV" />
       </div>
     </div>
 
@@ -113,6 +116,27 @@ export default {
         let messageEmcoded = encodeURI(messageTransform)
         window.open(element.url + '&text=' + messageEmcoded)
       }, message)
+    },
+    importCsv () {
+      const allText = this.message
+      alert(allText)
+
+      // const allTextLines = allText.split(/\r\n|\n/)
+
+      // const headers = allTextLines[0].split(',')
+      // const lines = []
+
+      // for (let i = 1; i < allTextLines.length; i++) {
+      //   const data = allTextLines[i].split(',')
+      //   if (data.length === headers.length) {
+      //     const tarr = []
+      //     for (let j = 0; j < headers.length; j++) {
+      //       tarr.push(headers[j] + ':' + data[j])
+      //     }
+      //     lines.push(tarr)
+      //   }
+      // }
+      // alert(lines)
     },
     onSubmit () {
       this.persons.push({
