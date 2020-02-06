@@ -1,29 +1,46 @@
 <template>
   <div class="q-pa-md">
-
     <div class="row q-mb-sm">
       <p class="q-ma-none text-caption text-weight-light" style="font-size: 0.6rem">
         * Não armazenamos nenhum contato em nossos servidores
       </p>
     </div>
-
     <div class="row q-mb-xl">
       <div class="col-12">
         <q-input
           v-model="message"
           filled
+          dense
           type="textarea"
           class="q-mb-sm"
           placeholder="Utilize [nome] para ser subistituído pelo nome do contato"
         />
-
-        <q-btn @click="sendForall" class="p-mb-xl" color="primary" style="width: 100%;" label="Enviar mensagem para todos" />
-      </div>
-      <div class="col-12 q-mt-sm">
-        <q-btn @click="importCsv" color="secondary" style="width: 100%;" label="Importar CSV" />
+        <q-btn @click="sendForall" class="q-mb-sm" color="primary" style="width: 100%;" label="Enviar mensagem para todos" />
+        <q-btn color="secondary" style="width: 100%;" label="Importar CSV" @click="prompt = true" />
       </div>
     </div>
 
+    <q-dialog v-model="prompt" persistent>
+      <q-card style="min-width: 350px">
+        <q-card-section>
+<!--          <div class="text-h6">Your address</div>-->
+        </q-card-section>
+        <q-card-section class="q-pt-none">
+          <q-input
+            v-model="csvContent"
+            filled
+            dense
+            type="textarea"
+            class="q-mb-sm"
+            placeholder="Cole aqui o conteúdo do seu arquivo csv"
+          />
+        </q-card-section>
+        <q-card-actions align="center" class="text-primary justify-between">
+          <q-btn outline label="Fechar" color="red" v-close-popup />
+          <q-btn outline color="primary" label="Importar" @click="importCsv" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
     <q-form
       @submit="onSubmit"
       class="q-gutter-md"
@@ -55,24 +72,18 @@
         />
         </div>
       </div>
-
-<!--      <q-toggle v-model="accept" label="I accept the license and terms" />-->
-
       <div class="row justify-between text-right">
         <q-btn size="md" label="Adicionar número a lista" type="submit" style="width: 100%" outline color="dark"/>
       </div>
     </q-form>
 
     <div class="q-pa-md">
-<!--      <q-toggle v-model="expanded" label="Expanded" class="q-mb-md" />-->
-
       <q-expansion-item
         v-model="expanded"
         icon="perm_identity"
         label="Listagem de Contatos"
         caption="Clique para visualizar"
       >
-
         <q-list bordered separator>
           <template v-for="person in persons">
             <q-item @click="onClick(person.url)" clickable v-ripple>
@@ -80,7 +91,6 @@
             </q-item>
           </template>
         </q-list>
-
       </q-expansion-item>
     </div>
 
@@ -94,14 +104,15 @@ export default {
     return {
       name: null,
       phone: null,
-      persons: [{
-        name: 'Gilvan Jr',
-        phone: '84998271900',
-        url: 'http://api.whatsapp.com/send?phone=5584998271900'
-      }],
+      persons: [],
       accept: false,
       expanded: true,
-      message: ''
+      message: '',
+      csvContent: '',
+      alert: false,
+      confirm: false,
+      prompt: false,
+      address: ''
     }
   },
 
@@ -118,25 +129,26 @@ export default {
       }, message)
     },
     importCsv () {
-      const allText = this.message
-      alert(allText)
+      const allText = this.csvContent
+      const allTextLines = allText.split(/\r\n|\n/)
 
-      // const allTextLines = allText.split(/\r\n|\n/)
+      allTextLines.forEach((element, index, array) => {
+        if (element !== 'nome,telefone') {
+          const data = element.split(',')
+          this.persons.push({
+            name: data[0],
+            phone: data[1],
+            url: 'http://api.whatsapp.com/send?phone=55' + data[1]
+          })
+        }
+      })
 
-      // const headers = allTextLines[0].split(',')
-      // const lines = []
+      this.prompt = !this.prompt
 
-      // for (let i = 1; i < allTextLines.length; i++) {
-      //   const data = allTextLines[i].split(',')
-      //   if (data.length === headers.length) {
-      //     const tarr = []
-      //     for (let j = 0; j < headers.length; j++) {
-      //       tarr.push(headers[j] + ':' + data[j])
-      //     }
-      //     lines.push(tarr)
-      //   }
-      // }
-      // alert(lines)
+      this.$q.notify({
+        message: 'Conteúdo importado',
+        color: 'green'
+      })
     },
     onSubmit () {
       this.persons.push({
