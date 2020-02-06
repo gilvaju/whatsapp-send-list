@@ -1,6 +1,12 @@
 <template>
   <div class="q-pa-md">
 
+    <div class="row q-mb-sm">
+      <p class="q-ma-none text-caption text-weight-light" style="font-size: 0.6rem">
+        * Não armazenamos nenhum contato em nossos servidores
+      </p>
+    </div>
+
     <div class="row q-mb-xl">
       <div class="col-12">
         <q-input
@@ -8,6 +14,7 @@
           filled
           type="textarea"
           class="q-mb-sm"
+          placeholder="Utilize [nome] para ser subistituído pelo nome do contato"
         />
 
         <q-btn @click="sendForall" color="primary" style="width: 100%;" label="Enviar mensagem para todos" />
@@ -16,7 +23,6 @@
 
     <q-form
       @submit="onSubmit"
-      @reset="onReset"
       class="q-gutter-md"
     >
       <div class="row justify-between">
@@ -85,9 +91,14 @@ export default {
     return {
       name: null,
       phone: null,
-      persons: [],
+      persons: [{
+        name: 'Gilvan Jr',
+        phone: '84998271900',
+        url: 'http://api.whatsapp.com/send?phone=5584998271900'
+      }],
       accept: false,
-      expanded: true
+      expanded: true,
+      message: ''
     }
   },
 
@@ -96,23 +107,23 @@ export default {
       window.open(url)
     },
     sendForall () {
-      function urlOpen (element, index, array) {
-        window.open(element.url)
-      }
-      this.persons.forEach(urlOpen)
+      let message = this.message
+      this.persons.forEach((element, index, array) => {
+        let messageTransform = message.replace('[nome]', element.name)
+        let messageEmcoded = encodeURI(messageTransform)
+        window.open(element.url + '&text=' + messageEmcoded)
+      }, message)
     },
     onSubmit () {
       this.persons.push({
         name: this.name,
         phone: this.phone,
-        url: 'http://wa.me/55' + this.phone
+        url: 'http://api.whatsapp.com/send?phone=55' + this.phone
       })
-    },
-
-    onReset () {
-      this.name = null
-      this.phone = null
-      this.accept = false
+      this.$q.notify({
+        message: 'Número adicionado a lista',
+        color: 'green'
+      })
     }
   }
 }
