@@ -16,11 +16,14 @@
           placeholder="Utilize [nome] para ser subistituído pelo nome do contato"
         />
         <q-btn @click="sendForall" class="q-mb-sm" color="primary" style="width: 100%;" label="Enviar mensagem para todos" />
-        <q-btn color="secondary" style="width: 100%;" label="Importar CSV" @click="prompt = true" />
+        <div class="row justify-between">
+          <q-btn color="secondary" style="width: 45%;" label="Csv com ," @click="prompt1 = true" />
+          <q-btn color="info" style="width: 45%;" label="Csv com ;" @click="prompt2 = true" />
+        </div>
       </div>
     </div>
 
-    <q-dialog v-model="prompt" persistent>
+    <q-dialog v-model="prompt1" persistent>
       <q-card style="min-width: 350px">
         <q-card-section>
 <!--          <div class="text-h6">Your address</div>-->
@@ -32,12 +35,34 @@
             dense
             type="textarea"
             class="q-mb-sm"
-            placeholder="Cole aqui o conteúdo do seu arquivo csv"
+            placeholder="Cole aqui o conteúdo do seu arquivo csv separado por vírgulas"
           />
         </q-card-section>
         <q-card-actions align="center" class="text-primary justify-between">
           <q-btn outline label="Fechar" color="red" v-close-popup />
-          <q-btn outline color="primary" label="Importar" @click="importCsv" />
+          <q-btn outline color="primary" label="Importar" @click="importCsv1" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="prompt2" persistent>
+      <q-card style="min-width: 350px">
+        <q-card-section>
+          <!--          <div class="text-h6">Your address</div>-->
+        </q-card-section>
+        <q-card-section class="q-pt-none">
+          <q-input
+            v-model="csvContent"
+            filled
+            dense
+            type="textarea"
+            class="q-mb-sm"
+            placeholder="Cole aqui o conteúdo do seu arquivo csv separado por ponto e vírgulas"
+          />
+        </q-card-section>
+        <q-card-actions align="center" class="text-primary justify-between">
+          <q-btn outline label="Fechar" color="red" v-close-popup />
+          <q-btn outline color="primary" label="Importar" @click="importCsv2" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -111,7 +136,8 @@ export default {
       csvContent: '',
       alert: false,
       confirm: false,
-      prompt: false,
+      prompt1: false,
+      prompt2: false,
       address: ''
     }
   },
@@ -131,13 +157,39 @@ export default {
         window.open(element.url + '&text=' + messageEmcoded)
       }, message)
     },
-    importCsv () {
+    importCsv1 () {
       const allText = this.csvContent
       const allTextLines = allText.split(/\r\n|\n/)
 
       allTextLines.forEach((element, index, array) => {
         if (element !== 'nome,telefone') {
           const data = element.split(',')
+          let number = data[1]
+            .replace('(', '')
+            .replace(')', '')
+            .replace(' ', '')
+          this.persons.push({
+            name: data[0],
+            phone: data[1],
+            url: 'http://api.whatsapp.com/send?phone=55' + number
+          })
+        }
+      })
+
+      this.prompt = !this.prompt
+
+      this.$q.notify({
+        message: 'Conteúdo importado',
+        color: 'green'
+      })
+    },
+    importCsv2 () {
+      const allText = this.csvContent
+      const allTextLines = allText.split(/\r\n|\n/)
+
+      allTextLines.forEach((element, index, array) => {
+        if (element !== 'nome,telefone') {
+          const data = element.split(';')
           let number = data[1]
             .replace('(', '')
             .replace(')', '')
