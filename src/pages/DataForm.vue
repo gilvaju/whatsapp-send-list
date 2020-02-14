@@ -118,7 +118,10 @@ export default {
 
   methods: {
     onClick (url) {
-      window.open(url)
+      window.open(url
+        .replace('(', '')
+        .replace(')', '')
+        .replace(' ', ''))
     },
     sendForall () {
       let message = this.message
@@ -135,10 +138,14 @@ export default {
       allTextLines.forEach((element, index, array) => {
         if (element !== 'nome,telefone') {
           const data = element.split(',')
+          let number = data[1]
+            .replace('(', '')
+            .replace(')', '')
+            .replace(' ', '')
           this.persons.push({
             name: data[0],
             phone: data[1],
-            url: 'http://api.whatsapp.com/send?phone=55' + data[1]
+            url: 'http://api.whatsapp.com/send?phone=55' + number
           })
         }
       })
